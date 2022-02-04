@@ -6,6 +6,7 @@ def readfile(filename):
     file.close()
     return words
 
+
 def doubleLetterCheck(words):
     noDoubles = []
     # Checks word for double letters and if word has 5 unique letters, it adds the word to a separate list
@@ -82,6 +83,7 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
     words = bestWords
     bestWords = []
 
+    # Puts the best words to guess in a list
     for word in words:
         wordTotal = 0
         for letter in word:
@@ -89,6 +91,7 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
         if wordTotal < 20:
             bestWords.append(word)
 
+    # Shows the best words to guess
     print("The best words are:")
     print(bestWords)
     print()
@@ -116,10 +119,3 @@ words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, le
 words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
 words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
 words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
-
-# for word in noDoubles:
-#    wordTotal = 0
-#    for letter in word:
-#        wordTotal += bestLetters.index(letter)
-#    if wordTotal < 15:
-#        bestWords.append(word)
