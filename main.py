@@ -55,13 +55,18 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
         bestLetters.remove(letter)
 
     # Checks all words which have the same letter placing as final words and then those words become the best words list
-    letterCount = 0
-    for letter in finalWord:
-        if letter.isalpha():
-            for word in words:
-                if word[letterCount] == letter:
-                    bestWords.append(word)
-        letterCount += 1
+    for word in words:
+        letterCount = 0
+        letterPlace = 0
+        for letter in finalWord:
+            if letter.isalpha():
+                if word[letterPlace] == letter:
+                    letterCount += 1
+            else:
+                letterCount += 1
+            letterPlace += 1
+        if letterCount == 5:
+            bestWords.append(word)
 
     words = bestWords
     bestWords = []
@@ -81,13 +86,15 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
         wordTotal = 0
         for letter in word:
             wordTotal += bestLetters.index(letter)
-        if wordTotal < 17:
+        if wordTotal < 20:
             bestWords.append(word)
 
     print("The best words are:")
     print(bestWords)
     print()
     bestWords = []
+
+    letterIndex = [1, 2, 3, 4, 5]
 
     return words, bestWords, letterIndex, finalWord
 
@@ -103,6 +110,10 @@ letterIndex = [1, 2, 3, 4, 5]
 removedLetters = []
 bestWords = []
 
+words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
+words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
+words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
+words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
 words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
 words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
 
