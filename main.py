@@ -31,6 +31,10 @@ def doubleLetterCheck(words):
 def guessPositioning(words, bestWords, letterIndex, finalWord):
     global lettersInWord
     guessedWord = input("What was your word? ")
+
+    while len(guessedWord) != 5 or guessedWord not in words:
+        guessedWord = input("That is not a valid guess. What was your word? ")
+
     # asks how many letters are green and then saves those letters into final word
     correctPosition = input("Which position letters were green (1-5)? (0 for none) ")
     if correctPosition != "0":
