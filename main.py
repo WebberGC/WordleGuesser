@@ -31,22 +31,25 @@ def doubleLetterCheck(words):
 def guessPositioning(words, bestWords, letterIndex, finalWord):
     global lettersInWord
     guessedWord = input("What was your word? ")
+
     while len(guessedWord) != 5 or guessedWord not in words:
         guessedWord = input("That is not a valid guess. What was your word? ")
 
     # asks how many letters are green and then saves those letters into final word
-    correctPosition = int(input("How many letters were green? "))
-    for number in range(1, correctPosition + 1):
-        letterPosition = int(input("What position is the letter (1-5)? "))
-        letterIndex.remove(letterPosition)
-        finalWord[letterPosition - 1] = guessedWord[letterPosition - 1]
+    correctPosition = input("Which position letters were green (1-5)? (0 for none) ")
+    if correctPosition != "0":
+        for number in correctPosition:
+            number = int(number)
+            letterIndex.remove(number)
+            finalWord[number - 1] = guessedWord[number - 1]
 
     # asks how many letters are yellow and saves those letters into lettersInWord
-    correctLetter = int(input("How many letters were yellow? "))
-    for number in range(1, correctLetter + 1):
-        letterPosition = int(input("What position is the letter (1-5)? "))
-        letterIndex.remove(letterPosition)
-        lettersInWord = addToList([guessedWord[letterPosition - 1], letterPosition], lettersInWord)
+    correctLetter = input("Which position letters were yellow (1-5)? (0 for none) ")
+    if correctLetter != "0":
+        for number in correctLetter:
+            number = int(number)
+            letterIndex.remove(number)
+            lettersInWord = addToList([guessedWord[number - 1], number], lettersInWord)
 
     # deletes all words with incorrect letters
     for word in words:
@@ -64,7 +67,8 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
     # removes incorrect letters from bestLetters
     for index in letterIndex:
         letter = guessedWord[index - 1]
-        bestLetters.remove(letter)
+        if letter in bestLetters:
+            bestLetters.remove(letter)
 
     # Checks all words which have the same letter placing as final words and then those words become the best words list
     for word in words:
@@ -84,25 +88,26 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
     bestWords = []
 
     # Checks all words which have the same letters as the final word and then those words become the best words list
-    for word in words:
-        letterCount = 0
-        for letter in lettersInWord:
-            if letter[0] not in word:
-                continue
-            if letter[0] != word[letter[1]-1]:
-                letterCount += 1
-            if letterCount == len(lettersInWord):
-                bestWords = addToList(word, bestWords)
+    if len(lettersInWord) > 0:
+        for word in words:
+            letterCount = 0
+            for letter in lettersInWord:
+                if letter[0] not in word:
+                    continue
+                if letter[0] != word[letter[1]-1]:
+                    letterCount += 1
+                if letterCount == len(lettersInWord):
+                    bestWords = addToList(word, bestWords)
 
-    words = bestWords
-    bestWords = []
+        words = bestWords
+        bestWords = []
 
     # Puts the best words to guess in a list
     for word in words:
         wordTotal = 0
         for letter in word:
             wordTotal += bestLetters.index(letter)
-        if wordTotal < 30:
+        if wordTotal < 50:
             bestWords = addToList(word, bestWords)
 
     # Shows the best words to guess
