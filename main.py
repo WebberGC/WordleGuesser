@@ -1,3 +1,4 @@
+# function which reads the file and adds all words in the file to a list
 def readfile(filename):
     file = open(filename, "r")
     words = []
@@ -7,6 +8,7 @@ def readfile(filename):
     return words
 
 
+# function which adds items to a list
 def addToList(word, list):
     for item in list:
         if word == item:
@@ -15,21 +17,34 @@ def addToList(word, list):
     return list
 
 
-def doubleLetterCheck(words):
-    noDoubles = []
-    # Checks word for double letters and if word has 5 unique letters, it adds the word to a separate list
-    for word in words:
-        letters = []
-        for letter in word:
-            if letter not in letters:
-                letters = addToList(letter, letters)
-        if len(letters) == 5:
-            noDoubles = addToList(word, noDoubles)
-    return noDoubles
+# function which calculates letter value
+def calculateLetterValue(letters, words):
+    letterCount = 0  # Counts the placing of each letter, A = 1, B = 2 etc
+    values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    # If that letter is in the current word, the placing of that letter in the above list will increase it's value by 1
+    for letter in letters:
+        for word in words:
+            if letter in word:
+                values[letterCount] += 1
+        letterCount += 1
+    return values
+
+
+# Checks word for double letters and if word has 5 unique letters, the function returns True
+def doubleLetterCheck(word):
+    letters = []
+    for letter in word:
+        if letter not in letters:
+            letters = addToList(letter, letters)
+    if len(letters) == 5:
+        return False
+    return True
 
 
 def guessPositioning(words, bestWords, letterIndex, finalWord):
     global lettersInWord
+    global letterValues
+
     guessedWord = input("What was your word? ")
 
     while len(guessedWord) != 5 or guessedWord not in words:
@@ -107,16 +122,24 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
         bestWords = []
 
     # Puts the best words to guess in a list
+    letterValues = calculateLetterValue(alphabet, words)
+    newWordList = []
     for word in words:
-        wordTotal = 0
+        currValue = 0
         for letter in word:
-            wordTotal += bestLetters.index(letter)
-        if wordTotal < 50:
-            bestWords = addToList(word, bestWords)
+            placing = alphabet.index(letter)
+            currValue += letterValues[placing]
+        if doubleLetterCheck(word) is True:
+            currValue = int(currValue/2)
+        newWordList.append([word, currValue])
+        newWordList.sort(key=lambda x: x[1], reverse=True)
+
 
     # Shows the best words to guess
     print("The best words are:")
-    print(bestWords)
+    rangeNumber = min(len(newWordList), 5)
+    for number in range(0, rangeNumber):
+        print(str(number + 1) + ".", newWordList[number][0], "-", newWordList[number][1], "points")
     print()
     bestWords = []
 
@@ -135,6 +158,10 @@ lettersInWord = []
 letterIndex = [1, 2, 3, 4, 5]
 removedLetters = []
 bestWords = []
+
+alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u",
+            "v", "w", "x", "y", "z"]
+letterValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
 words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
