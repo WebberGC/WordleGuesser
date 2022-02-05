@@ -2,9 +2,17 @@ def readfile(filename):
     file = open(filename, "r")
     words = []
     for word in file.readlines():
-        words.append(word[:-1])
+        words = addToList(word[:-1], words)
     file.close()
     return words
+
+
+def addToList(word, list):
+    for item in list:
+        if word == item:
+            return list
+    list.append(word)
+    return list
 
 
 def doubleLetterCheck(words):
@@ -14,13 +22,14 @@ def doubleLetterCheck(words):
         letters = []
         for letter in word:
             if letter not in letters:
-                letters.append(letter)
+                letters = addToList(letter, letters)
         if len(letters) == 5:
-            noDoubles.append(word)
+            noDoubles = addToList(word, noDoubles)
     return noDoubles
 
 
 def guessPositioning(words, bestWords, letterIndex, finalWord):
+    global lettersInWord
     guessedWord = input("What was your word? ")
 
     # asks how many letters are green and then saves those letters into final word
@@ -35,7 +44,7 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
     for number in range(1, correctLetter + 1):
         letterPosition = int(input("What position is the letter (1-5)? "))
         letterIndex.remove(letterPosition)
-        lettersInWord.append(guessedWord[letterPosition - 1])
+        lettersInWord = addToList([guessedWord[letterPosition - 1], letterPosition], lettersInWord)
 
     # deletes all words with incorrect letters
     for word in words:
@@ -45,7 +54,7 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
             if letter not in word:
                 letterCount += 1
             if letterCount == len(letterIndex):
-                bestWords.append(word)
+                bestWords = addToList(word, bestWords)
 
     words = bestWords
     bestWords = []
@@ -67,7 +76,7 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
                 letterCount += 1
             letterPlace += 1
         if letterCount == 5:
-            bestWords.append(word)
+            bestWords = addToList(word, bestWords)
 
     words = bestWords
     bestWords = []
@@ -76,10 +85,13 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
     for word in words:
         letterCount = 0
         for letter in lettersInWord:
-            if letter in word:
+            if letter[0] not in word:
+                continue
+            if letter[0] != word[letter[1]-1]:
                 letterCount += 1
             if letterCount == len(lettersInWord):
-                bestWords.append(word)
+                bestWords = addToList(word, bestWords)
+
     words = bestWords
     bestWords = []
 
@@ -88,8 +100,8 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
         wordTotal = 0
         for letter in word:
             wordTotal += bestLetters.index(letter)
-        if wordTotal < 20:
-            bestWords.append(word)
+        if wordTotal < 30:
+            bestWords = addToList(word, bestWords)
 
     # Shows the best words to guess
     print("The best words are:")
