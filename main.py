@@ -33,10 +33,12 @@ def calculateLetterValue(letters, words):
 # Checks word for double letters and if word has 5 unique letters, the function returns True
 def doubleLetterCheck(word):
     letters = []
+    if len(word) == 1:
+        return False
     for letter in word:
         if letter not in letters:
             letters = addToList(letter, letters)
-    if len(letters) == 5:
+    if len(letters) == len(word):
         return False
     return True
 
@@ -46,14 +48,15 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
     global letterValues
     global correctPosition
 
-    guessedWord = input("What was your word? \n")
+    guessedWord = input("What was your word? \n").lower()
 
-    while len(guessedWord) != 5 or guessedWord not in words:
-        guessedWord = input("That is not a valid guess. What was your word? ")
+    while guessedWord not in words:
+        guessedWord = input("That is not a valid guess. What was your word? \n").lower()
 
     # asks how many letters are green and then saves those letters into final word
     correctPosition = input("Which position letters were green (1-5)? (0 for none) ")
-    while "6" in correctPosition or "7" in correctPosition or "8" in correctPosition or "9" in correctPosition:
+    while "6" in correctPosition or "7" in correctPosition or "8" in correctPosition or "9" in correctPosition or \
+            doubleLetterCheck(correctPosition) is True:
         correctPosition = input("Invalid number. Which position letters were green (1-5)? (0 for none) ")
 
     if correctPosition == "12345":
@@ -67,8 +70,9 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
 
     # asks how many letters are yellow and saves those letters into lettersInWord
     correctLetter = input("Which position letters were yellow (1-5)? (0 for none) ")
-    while "6" in correctPosition or "7" in correctPosition or "8" in correctPosition or "9" in correctPosition:
-        correctPosition = input("Invalid number. Which position letters were yellow (1-5)? (0 for none) ")
+    while "6" in correctPosition or "7" in correctPosition or "8" in correctPosition or "9" in correctPosition or \
+            doubleLetterCheck(correctLetter) is True:
+        correctLetter = input("Invalid number. Which position letters were yellow (1-5)? (0 for none) ")
     if correctLetter != "0":
         for number in correctLetter:
             number = int(number)
@@ -140,7 +144,7 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
         newWordList.sort(key=lambda x: x[1], reverse=True)
 
     # Shows the best words to guess
-    print("The best words are:")
+    print("\nThe best words are:")
     rangeNumber = min(len(newWordList), 5)
     for number in range(0, rangeNumber):
         print(str(number + 1) + ".", newWordList[number][0], "-", newWordList[number][1], "points")
