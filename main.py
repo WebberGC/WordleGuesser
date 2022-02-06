@@ -58,13 +58,50 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
     global letterValues
     global correctPosition
 
-    guessedWord = input("\nWhat was your word? \n").lower()
+    # Puts the best words to guess in a list
+    letterValues, valuesList = calculateLetterValue(alphabet, words)
+    newWordList = []
+    for word in words:
+        currValue = 0
+        for letter in word:
+            placing = alphabet.index(letter)
+            letterPlacing = word.index(letter)
+            currValue += letterValues[placing]
+            currValue += valuesList[letterPlacing][placing]
+        if doubleLetterCheck(word) is True:
+            currValue = int(currValue / 2)
+        newWordList.append([word, currValue])
+        newWordList.sort(key=lambda x: x[1], reverse=True)
 
-    while guessedWord not in words:
-        guessedWord = input("That is not a valid guess. What was your word? \n").lower()
+    # Shows the best words to guess
+    print("\nThe best words are:")
+    rangeNumber = min(len(newWordList), 5)
+    for number in range(0, rangeNumber):
+        print(str(number + 1) + ".", newWordList[number][0], "-", newWordList[number][1], "points")
+    print()
+    bestWords = []
 
+    guessedWord = input("What was your word? \n")
+
+    if guessedWord.isnumeric():
+        guessedWord = int(guessedWord)
+        guessedWord = str(newWordList[guessedWord-1][0])
+    else:
+        guessedWord.islower()
+
+    guessedWord = str(guessedWord)
+    while guessedWord not in words and guessedWord.isnumeric():
+        guessedWord = input("That is not a valid guess. What was your word? \n")
+
+        if guessedWord.isnumeric():
+            guessedWord = int(guessedWord)
+            guessedWord = newWordList[guessedWord - 1]
+        else:
+            guessedWord.islower()
+
+    print("\nYou selected:", guessedWord)
     # asks how many letters are green and then saves those letters into final word
-    correctPosition = input("Which position letters were green (1-5)? (0 for none) ")
+    correctPosition = input("\nWhich position letters were green (1-5)? (0 for none) ")
     while "6" in correctPosition or "7" in correctPosition or "8" in correctPosition or "9" in correctPosition or \
             doubleLetterCheck(correctPosition) is True or (len(correctPosition) > 1 and "0" in correctPosition):
         correctPosition = input("Invalid number. Which position letters were green (1-5)? (0 for none) ")
@@ -139,29 +176,6 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
 
         words = bestWords
         bestWords = []
-
-    # Puts the best words to guess in a list
-    letterValues, valuesList = calculateLetterValue(alphabet, words)
-    newWordList = []
-    for word in words:
-        currValue = 0
-        for letter in word:
-            placing = alphabet.index(letter)
-            letterPlacing = word.index(letter)
-            currValue += letterValues[placing]
-            currValue += valuesList[letterPlacing][placing]
-        if doubleLetterCheck(word) is True:
-            currValue = int(currValue / 2)
-        newWordList.append([word, currValue])
-        newWordList.sort(key=lambda x: x[1], reverse=True)
-
-    # Shows the best words to guess
-    print("\nThe best words are:")
-    rangeNumber = min(len(newWordList), 5)
-    for number in range(0, rangeNumber):
-        print(str(number + 1) + ".", newWordList[number][0], "-", newWordList[number][1], "points")
-    print()
-    bestWords = []
 
     letterIndex = [1, 2, 3, 4, 5]
 
