@@ -103,7 +103,8 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
     # asks how many letters are green and then saves those letters into final word
     correctPosition = input("\nWhich position letters were green (1-5)? (0 for none) ")
     while "6" in correctPosition or "7" in correctPosition or "8" in correctPosition or "9" in correctPosition or \
-            doubleLetterCheck(correctPosition) is True or (len(correctPosition) > 1 and "0" in correctPosition):
+            doubleLetterCheck(correctPosition) is True or (len(correctPosition) > 1 and "0" in correctPosition) or \
+            correctPosition.isalpha():
         correctPosition = input("Invalid number. Which position letters were green (1-5)? (0 for none) ")
 
     if correctPosition == "12345":
@@ -118,7 +119,8 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
     # asks how many letters are yellow and saves those letters into lettersInWord
     correctLetter = input("Which position letters were yellow (1-5)? (0 for none) ")
     while "6" in correctPosition or "7" in correctPosition or "8" in correctPosition or "9" in correctPosition or \
-            doubleLetterCheck(correctLetter) is True or (len(correctLetter) > 1 and "0" in correctLetter):
+            doubleLetterCheck(correctLetter) is True or (len(correctLetter) > 1 and "0" in correctLetter) or \
+            correctPosition.isalpha():
         correctLetter = input("Invalid number. Which position letters were yellow (1-5)? (0 for none) ")
     if correctLetter != "0":
         for number in correctLetter:
