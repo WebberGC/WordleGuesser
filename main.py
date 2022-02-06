@@ -21,13 +21,23 @@ def addToList(word, list):
 def calculateLetterValue(letters, words):
     letterCount = 0  # Counts the placing of each letter, A = 1, B = 2 etc
     values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    firstValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    secondValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    thirdValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    fourthValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    fifthValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    valuesList = [firstValues, secondValues, thirdValues, fourthValues, fifthValues]
+
     # If that letter is in the current word, the placing of that letter in the above list will increase it's value by 1
     for letter in letters:
         for word in words:
             if letter in word:
                 values[letterCount] += 1
+                for position in range(5):
+                    if letter == word[position]:
+                        valuesList[position][letterCount] += 1
         letterCount += 1
-    return values
+    return values, valuesList
 
 
 # Checks word for double letters and if word has 5 unique letters, the function returns True
@@ -131,13 +141,15 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
         bestWords = []
 
     # Puts the best words to guess in a list
-    letterValues = calculateLetterValue(alphabet, words)
+    letterValues, valuesList = calculateLetterValue(alphabet, words)
     newWordList = []
     for word in words:
         currValue = 0
         for letter in word:
             placing = alphabet.index(letter)
+            letterPlacing = word.index(letter)
             currValue += letterValues[placing]
+            currValue += valuesList[letterPlacing][placing]
         if doubleLetterCheck(word) is True:
             currValue = int(currValue / 2)
         newWordList.append([word, currValue])
