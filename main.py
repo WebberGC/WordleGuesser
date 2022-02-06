@@ -44,8 +44,9 @@ def doubleLetterCheck(word):
 def guessPositioning(words, bestWords, letterIndex, finalWord):
     global lettersInWord
     global letterValues
+    global correctPosition
 
-    guessedWord = input("What was your word? ")
+    guessedWord = input("What was your word? \n")
 
     while len(guessedWord) != 5 or guessedWord not in words:
         guessedWord = input("That is not a valid guess. What was your word? ")
@@ -54,6 +55,10 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
     correctPosition = input("Which position letters were green (1-5)? (0 for none) ")
     while "6" in correctPosition or "7" in correctPosition or "8" in correctPosition or "9" in correctPosition:
         correctPosition = input("Invalid number. Which position letters were green (1-5)? (0 for none) ")
+
+    if correctPosition == "12345":
+        return words, bestWords, letterIndex, finalWord
+
     if correctPosition != "0":
         for number in correctPosition:
             number = int(number)
@@ -113,7 +118,7 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
             for letter in lettersInWord:
                 if letter[0] not in word:
                     continue
-                if letter[0] != word[letter[1]-1]:
+                if letter[0] != word[letter[1] - 1]:
                     letterCount += 1
                 if letterCount == len(lettersInWord):
                     bestWords = addToList(word, bestWords)
@@ -130,10 +135,9 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
             placing = alphabet.index(letter)
             currValue += letterValues[placing]
         if doubleLetterCheck(word) is True:
-            currValue = int(currValue/2)
+            currValue = int(currValue / 2)
         newWordList.append([word, currValue])
         newWordList.sort(key=lambda x: x[1], reverse=True)
-
 
     # Shows the best words to guess
     print("The best words are:")
@@ -148,8 +152,6 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
     return words, bestWords, letterIndex, finalWord
 
 
-words = readfile("Words")
-
 # letters ranked in order of how common they are in the words
 bestLetters = ["e", "a", "r", "o", "t", "i", "l", "s", "n", "u", "c", "y", "h", "d", "p", "g", "m", "b", "f", "k", "w",
                "v", "x", "z", "q", "j"]
@@ -162,10 +164,28 @@ bestWords = []
 alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u",
             "v", "w", "x", "y", "z"]
 letterValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+program = True
+correctPosition = ""
 
-words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
-words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
-words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
-words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
-words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
-words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
+while program is True:
+    turns = 1
+    words = readfile("Words")
+    finalWord = ["", "", "", "", ""]
+    lettersInWord = []
+    letterIndex = [1, 2, 3, 4, 5]
+    removedLetters = []
+    bestWords = []
+
+    alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u",
+                "v", "w", "x", "y", "z"]
+    letterValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    program = True
+    correctPosition = ""
+
+    while correctPosition != "12345" and turns < 6:
+        words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
+        turns += 1
+    playAgain = input("Do you wish to play again? Y/N ").lower()
+    if playAgain == "n":
+        print("\nThanks for playing!")
+        program = False
