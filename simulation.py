@@ -53,10 +53,13 @@ def doubleLetterCheck(word):
     return True
 
 
-def guessPositioning(words, bestWords, letterIndex, finalWord):
+def guessPositioning(wordAnswer, words, letterIndex, finalWord):
     global lettersInWord
     global letterValues
     global correctPosition
+    global statsList
+
+    answer = wordAnswer
 
     # Puts the best words to guess in a list
     letterValues, valuesList = calculateLetterValue(alphabet, words)
@@ -73,41 +76,27 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
         newWordList.append([word, currValue])
         newWordList.sort(key=lambda x: x[1], reverse=True)
 
-    # Shows the best words to guess
-    print("\nThe best words are:")
-    rangeNumber = min(len(newWordList), 5)
-    for number in range(0, rangeNumber):
-        print(str(number + 1) + ".", newWordList[number][0], "-", newWordList[number][1], "points")
-    print()
     bestWords = []
 
-    guessedWord = input("What was your word? \n")
+    guessedWord = str(newWordList[0][0])
 
-    if guessedWord.isnumeric():
-        guessedWord = int(guessedWord)
-        guessedWord = str(newWordList[guessedWord-1][0])
-    else:
-        guessedWord.islower()
-
-    guessedWord = str(guessedWord)
-    while guessedWord not in words and guessedWord.isnumeric():
-        guessedWord = input("That is not a valid guess. What was your word? \n")
-
-        if guessedWord.isnumeric():
-            guessedWord = int(guessedWord)
-            guessedWord = newWordList[guessedWord - 1]
-        else:
-            guessedWord.islower()
-
-    print("\nYou selected:", guessedWord)
+    print("You selected:", guessedWord)
     # asks how many letters are green and then saves those letters into final word
-    correctPosition = input("\nWhich position letters were green (1-5)? (0 for none) ")
-    while "6" in correctPosition or "7" in correctPosition or "8" in correctPosition or "9" in correctPosition or \
-            doubleLetterCheck(correctPosition) is True or (len(correctPosition) > 1 and "0" in correctPosition) or \
-            correctPosition.isalpha():
-        correctPosition = input("Invalid number. Which position letters were green (1-5)? (0 for none) ")
+
+    correctPosition = "0"
+    answerCount = 0
+    for letter in answer:
+        if letter == guessedWord[answerCount]:
+            if "0" in correctPosition:
+                correctPosition = ""
+            correctPosition = correctPosition + str(answerCount + 1)
+        answerCount += 1
+
 
     if correctPosition == "12345":
+        turnsIndex = turns - 1
+        statsList[turnsIndex] += 1
+
         return words, bestWords, letterIndex, finalWord
 
     if correctPosition != "0":
@@ -117,11 +106,18 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
             finalWord[number - 1] = guessedWord[number - 1]
 
     # asks how many letters are yellow and saves those letters into lettersInWord
-    correctLetter = input("Which position letters were yellow (1-5)? (0 for none) ")
-    while "6" in correctPosition or "7" in correctPosition or "8" in correctPosition or "9" in correctPosition or \
-            doubleLetterCheck(correctLetter) is True or (len(correctLetter) > 1 and "0" in correctLetter) or \
-            correctPosition.isalpha():
-        correctLetter = input("Invalid number. Which position letters were yellow (1-5)? (0 for none) ")
+    correctLetter = "0"
+    answerCount = 0
+    for letter in guessedWord:
+        if answerCount + 1 not in letterIndex:
+            answerCount += 1
+            continue
+        if letter in answer:
+            if correctLetter == "0":
+                correctLetter = ""
+            correctLetter = correctLetter + str(answerCount + 1)
+        answerCount += 1
+
     if correctLetter != "0":
         for number in correctLetter:
             number = int(number)
@@ -131,17 +127,14 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
     # deletes all words with incorrect letters
     for word in words:
         letterCount = 0
-
         for index in letterIndex:
             letter = guessedWord[index - 1]
             if letter not in word:
                 letterCount += 1
             if letterCount == len(letterIndex):
                 bestWords = addToList(word, bestWords)
-
     if len(letterIndex) > 1:
         words = bestWords
-
     bestWords = []
 
     # removes incorrect letters from bestLetters
@@ -190,11 +183,10 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
 # letters ranked in order of how common they are in the words
 bestLetters = ["e", "a", "r", "o", "t", "i", "l", "s", "n", "u", "c", "y", "h", "d", "p", "g", "m", "b", "f", "k", "w",
                "v", "x", "z", "q", "j"]
-finalWord = ["", "", "", "", ""]
 lettersInWord = []
-letterIndex = [1, 2, 3, 4, 5]
 removedLetters = []
-bestWords = []
+statsList = [0, 0, 0, 0, 0, 0, 0]
+
 
 alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u",
             "v", "w", "x", "y", "z"]
@@ -202,7 +194,11 @@ letterValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 program = True
 correctPosition = ""
 
-while program is True:
+simulationList = readfile("Words")
+
+
+for wordAnswer in simulationList:
+    print("\nAnswer is:", wordAnswer, "\n")
     turns = 1
     words = readfile("Words")
     finalWord = ["", "", "", "", ""]
@@ -216,11 +212,28 @@ while program is True:
     letterValues = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     program = True
     correctPosition = ""
+    removeYellow = [words, finalWord, letterIndex, bestWords]
 
     while correctPosition != "12345" and turns < 6:
-        words, bestWords, letterIndex, finalWord = guessPositioning(words, bestWords, letterIndex, finalWord)
+        words, bestWords, letterIndex, finalWord = guessPositioning(wordAnswer, words, letterIndex, finalWord)
         turns += 1
-    playAgain = input("Do you wish to play again? Y/N ").lower()
-    if playAgain == "n":
-        print("\nThanks for playing!")
-        program = False
+    if turns == 7:
+        statsList[6] += 1
+
+    print()
+    print("1 turn : ", statsList[0])
+    print("2 turns: ", statsList[1])
+    print("3 turns: ", statsList[2])
+    print("4 turns: ", statsList[3])
+    print("5 turns: ", statsList[4])
+    print("6 turns: ", statsList[5])
+    print("Failed : ", statsList[6])
+    wins = statsList[0] + statsList[1] + statsList[2] + statsList[3] + statsList[4] + statsList[5]
+    games = wins + statsList[6]
+    average = (((1*statsList[0]) + (2*statsList[1]) + (3*statsList[2]) + (4*statsList[3]) + (5*statsList[4]) +
+               (6*statsList[5])) / wins)
+    print("Average:", round(average, 2))
+    print("Win percentage:", round((wins/games)*100))
+    print()
+
+print(statsList)
