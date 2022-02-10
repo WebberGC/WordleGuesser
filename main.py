@@ -57,11 +57,14 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
     global lettersInWord
     global letterValues
     global correctPosition
+    global allowedGuesses
 
     # Puts the best words to guess in a list
     letterValues, valuesList = calculateLetterValue(alphabet, words)
     newWordList = []
-    for word in words:
+    if len(allowedGuesses) < 10 or turns >= 3:
+        allowedGuesses = words
+    for word in allowedGuesses:
         currValue = 0
         for letter in word:
             placing = alphabet.index(letter)
@@ -129,6 +132,21 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
             lettersInWord = addToList([guessedWord[number - 1], number], lettersInWord)
 
     # deletes all words with incorrect letters
+    for word in allowedGuesses:
+        letterCount = 0
+
+        for index in letterIndex:
+            letter = guessedWord[index - 1]
+            if letter not in word:
+                letterCount += 1
+            if letterCount == len(letterIndex):
+                bestWords = addToList(word, bestWords)
+
+    if len(letterIndex) > 1:
+        allowedGuesses = bestWords
+
+    bestWords = []
+
     for word in words:
         letterCount = 0
 
@@ -167,6 +185,22 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
     words = bestWords
     bestWords = []
 
+    for word in allowedGuesses:
+        letterCount = 0
+        letterPlace = 0
+        for letter in finalWord:
+            if letter.isalpha():
+                if word[letterPlace] == letter:
+                    letterCount += 1
+            else:
+                letterCount += 1
+            letterPlace += 1
+        if letterCount == 5:
+            bestWords = addToList(word, bestWords)
+
+    allowedGuesses = bestWords
+    bestWords = []
+
     # Checks all words which have the same letters as the final word and then those words become the best words list
     if len(lettersInWord) > 0:
         for word in words:
@@ -180,6 +214,19 @@ def guessPositioning(words, bestWords, letterIndex, finalWord):
                     bestWords = addToList(word, bestWords)
 
         words = bestWords
+        bestWords = []
+
+        for word in allowedGuesses:
+            letterCount = 0
+            for letter in lettersInWord:
+                if letter[0] not in word:
+                    continue
+                if letter[0] != word[letter[1] - 1]:
+                    letterCount += 1
+                if letterCount == len(lettersInWord):
+                    bestWords = addToList(word, bestWords)
+
+        allowedGuesses = bestWords
         bestWords = []
 
     letterIndex = [1, 2, 3, 4, 5]
@@ -205,6 +252,7 @@ correctPosition = ""
 while program is True:
     turns = 1
     words = readfile("Words")
+    allowedGuesses = readfile("AllowedGuesses")
     finalWord = ["", "", "", "", ""]
     lettersInWord = []
     letterIndex = [1, 2, 3, 4, 5]

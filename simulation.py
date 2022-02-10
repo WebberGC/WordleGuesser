@@ -58,13 +58,16 @@ def guessPositioning(wordAnswer, words, letterIndex, finalWord):
     global letterValues
     global correctPosition
     global statsList
+    global allowedGuesses
 
     answer = wordAnswer
 
     # Puts the best words to guess in a list
     letterValues, valuesList = calculateLetterValue(alphabet, words)
     newWordList = []
-    for word in words:
+    if len(allowedGuesses) < 10 or turns >= 3:
+        allowedGuesses = words
+    for word in allowedGuesses:
         currValue = 0
         for letter in word:
             placing = alphabet.index(letter)
@@ -91,7 +94,6 @@ def guessPositioning(wordAnswer, words, letterIndex, finalWord):
                 correctPosition = ""
             correctPosition = correctPosition + str(answerCount + 1)
         answerCount += 1
-
 
     if correctPosition == "12345":
         turnsIndex = turns - 1
@@ -125,6 +127,18 @@ def guessPositioning(wordAnswer, words, letterIndex, finalWord):
             lettersInWord = addToList([guessedWord[number - 1], number], lettersInWord)
 
     # deletes all words with incorrect letters
+    for word in allowedGuesses:
+        letterCount = 0
+        for index in letterIndex:
+            letter = guessedWord[index - 1]
+            if letter not in word:
+                letterCount += 1
+            if letterCount == len(letterIndex):
+                bestWords = addToList(word, bestWords)
+    if len(letterIndex) > 1:
+        allowedGuesses = bestWords
+    bestWords = []
+
     for word in words:
         letterCount = 0
         for index in letterIndex:
@@ -144,6 +158,22 @@ def guessPositioning(wordAnswer, words, letterIndex, finalWord):
             bestLetters.remove(letter)
 
     # Checks all words which have the same letter placing as final words and then those words become the best words list
+    for word in allowedGuesses:
+        letterCount = 0
+        letterPlace = 0
+        for letter in finalWord:
+            if letter.isalpha():
+                if word[letterPlace] == letter:
+                    letterCount += 1
+            else:
+                letterCount += 1
+            letterPlace += 1
+        if letterCount == 5:
+            bestWords = addToList(word, bestWords)
+
+    allowedGuesses = bestWords
+    bestWords = []
+
     for word in words:
         letterCount = 0
         letterPlace = 0
@@ -175,6 +205,19 @@ def guessPositioning(wordAnswer, words, letterIndex, finalWord):
         words = bestWords
         bestWords = []
 
+        for word in allowedGuesses:
+            letterCount = 0
+            for letter in lettersInWord:
+                if letter[0] not in word:
+                    continue
+                if letter[0] != word[letter[1] - 1]:
+                    letterCount += 1
+                if letterCount == len(lettersInWord):
+                    bestWords = addToList(word, bestWords)
+
+        allowedGuesses = bestWords
+        bestWords = []
+
     letterIndex = [1, 2, 3, 4, 5]
 
     return words, bestWords, letterIndex, finalWord
@@ -201,6 +244,7 @@ for wordAnswer in simulationList:
     print("\nAnswer is:", wordAnswer, "\n")
     turns = 1
     words = readfile("Words")
+    allowedGuesses = readfile("AllowedGuesses")
     finalWord = ["", "", "", "", ""]
     lettersInWord = []
     letterIndex = [1, 2, 3, 4, 5]
@@ -220,6 +264,10 @@ for wordAnswer in simulationList:
     if turns == 7:
         statsList[6] += 1
 
+    if turns < 7:
+        print("\nSuccessfully guessed the word in", turns - 1, "turns.\n")
+    else:
+        print("\nFailed.\n")
     print()
     print("1 turn : ", statsList[0])
     print("2 turns: ", statsList[1])
